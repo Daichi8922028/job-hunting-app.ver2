@@ -4,6 +4,7 @@ class ChatSystem {
   constructor() {
     this.currentChatType = null;
     this.currentChatId = null;
+    this.userId = null;
     this.chatHistory = {
       self: [],
       company: [],
@@ -11,9 +12,12 @@ class ChatSystem {
     };
     this.isTyping = false;
     this.init();
-  }  init() {
+  }
+
+  async init() {
+    await this.waitForFirebase();
     // チャット履歴をローカルストレージから読み込み
-    this.loadChatHistory();
+    await this.loadChatHistory();
     
     // チャットセッションをローカルストレージから読み込み
     this.loadChatSessions();
@@ -53,6 +57,19 @@ class ChatSystem {
       textarea.addEventListener('input', () => {
         textarea.style.height = 'auto';
         textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+      });
+    });
+  }
+
+  // Wait until Firebase is ready and obtain the UID
+  async waitForFirebase() {
+    if (!window.firebase) return;
+    await new Promise(resolve => {
+      firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+          this.userId = user.uid;
+          resolve();
+        }
       });
     });
   }
@@ -162,8 +179,18 @@ class ChatSystem {
       timestamp: new Date().toISOString(),
       type: type
     };
-    
+
     this.chatHistory[type].push(chatEntry);
+
+    // Save to Firestore if available
+    if (window.db && this.userId) {
+      window.db
+        .collection('chats')
+        .doc(this.userId)
+        .collection('messages')
+        .add(chatEntry)
+        .catch(err => console.error('Firestore save error:', err));
+    }
     
     // チャットセッションのタイトルを更新（最初のユーザーメッセージから）
     if (sender === 'user') {
@@ -389,10 +416,25 @@ class ChatSystem {
       `<button class="prompt-btn" onclick="sendSuggestedPrompt('${prompt}')">${prompt}</button>`
     ).join('');
   }
-  loadChatHistory() {
+  async loadChatHistory() {
     const saved = localStorage.getItem('jobHuntingApp_chatHistory');
     if (saved) {
       this.chatHistory = JSON.parse(saved);
+    }
+
+    // Load from Firestore if available
+    if (window.db && this.userId) {
+      try {
+        const snapshot = await window.db.collection('chats').doc(this.userId).collection('messages').orderBy('timestamp').get();
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (this.chatHistory[data.type]) {
+            this.chatHistory[data.type].push(data);
+          }
+        });
+      } catch (e) {
+        console.error('Firestore load error:', e);
+      }
     }
   }
 
