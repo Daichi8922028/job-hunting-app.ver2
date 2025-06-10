@@ -6,23 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', function(e) {
       e.preventDefault();
 
-      // ------ テスト用：何を入力してもホーム画面へ進む ------
-      showScreen('home-screen');
-
-      /* ------ 本来の認証処理（DB連携/LocalStorage用） ------
       const email = loginForm.elements['email'].value;
       const password = loginForm.elements['password'].value;
-      // 例：localStorageから値を取得して認証
-      if (
-        email === localStorage.getItem('userEmail') &&
-        password === localStorage.getItem('userPassword')
-      ) {
-        showScreen('home-screen');
-      } else {
-        alert('メールアドレスまたはパスワードが違います');
-      }
-      // ------ 本来の認証ここまで ------
-      */
+      login(email, password)
+        .then(() => {
+          showScreen('home-screen');
+        })
+        .catch(() => {
+          // エラー処理はlogin内でアラート表示
+        });
     });
   }
 });
