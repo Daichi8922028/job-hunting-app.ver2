@@ -122,12 +122,17 @@ class ChatSystem {
     
     // AIの応答の場合はMarkdownをHTMLに変換
     if (sender === 'ai' && typeof marked !== 'undefined') {
-      try {
-        messageBubble.innerHTML = marked.parse(content);
-      } catch (error) {
-        console.warn('Markdown parsing failed, using plain text:', error);
-        messageBubble.textContent = content;
-      }
+        try {
+          const html = marked.parse(content);
+          if (typeof DOMPurify !== 'undefined') {
+            messageBubble.innerHTML = DOMPurify.sanitize(html);
+          } else {
+            messageBubble.innerHTML = html;
+          }
+        } catch (error) {
+          console.warn('Markdown parsing failed, using plain text:', error);
+          messageBubble.textContent = content;
+        }
     } else {
       messageBubble.textContent = content;
     }
@@ -530,13 +535,18 @@ class ChatSystem {
     messageBubble.className = `message-bubble ${sender}`;
     
     // AIの応答の場合はMarkdownをHTMLに変換
-    if (sender === 'ai' && typeof marked !== 'undefined') {
-      try {
-        messageBubble.innerHTML = marked.parse(content);
-      } catch (error) {
-        console.warn('Markdown parsing failed, using plain text:', error);
-        messageBubble.textContent = content;
-      }
+      if (sender === 'ai' && typeof marked !== 'undefined') {
+        try {
+          const html = marked.parse(content);
+          if (typeof DOMPurify !== 'undefined') {
+            messageBubble.innerHTML = DOMPurify.sanitize(html);
+          } else {
+            messageBubble.innerHTML = html;
+          }
+        } catch (error) {
+          console.warn('Markdown parsing failed, using plain text:', error);
+          messageBubble.textContent = content;
+        }
     } else {
       messageBubble.textContent = content;
     }
