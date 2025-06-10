@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   sendBtn.textContent = '送信';
 
   // 初回メッセージ
-  chatArea.innerHTML = `<div class="chat-message system">自己分析のサポートをします。何でも入力してください。</div>`;
+  chatArea.innerHTML = '<div class="chat-message system">自己分析のサポートをします。何でも入力してください。</div>';
   chatArea.appendChild(input);
   chatArea.appendChild(sendBtn);
 

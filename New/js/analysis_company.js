@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sendBtn = document.createElement('button');
   sendBtn.textContent = '送信';
 
-  chatArea.innerHTML = `<div class="chat-message system">企業分析のお手伝いをします。質問や知りたい企業名を入力してください。</div>`;
+  chatArea.innerHTML = '<div class="chat-message system">企業分析のお手伝いをします。質問や知りたい企業名を入力してください。</div>';
   chatArea.appendChild(input);
   chatArea.appendChild(sendBtn);
 
