@@ -3,9 +3,9 @@
 const AppConfig = {
   // Google AI Studio API設定
   ai: {
-    // 実際のAPIキーをここに設定してください
-    // Google AI Studioで取得したAPIキーに置き換えてください
-    apiKey: 'AIzaSyCDBqwf19rjKWOtPB7J-ZTHSTiV2-RRLRA',
+    // Google AI Studio APIキー
+    // 環境変数 GEMINI_API_KEY を参照し、未設定の場合はプレースホルダーを使用
+    apiKey: process.env.GEMINI_API_KEY || 'YOUR_GOOGLE_AI_STUDIO_API_KEY',
     
     // APIが無効の場合はフォールバック応答を使用
     enableFallback: true,

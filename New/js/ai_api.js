@@ -2,10 +2,10 @@
 
 class AIAPIService {
   constructor() {
-    // 本番環境では環境変数や設定ファイルから取得
-    this.apiKey = 'AIzaSyCDBqwf19rjKWOtPB7J-ZTHSTiV2-RRLRA'; // 実際のAPIキーに置き換え
+    // 環境変数からAPIキーを取得
+    this.apiKey = process.env.GEMINI_API_KEY || 'YOUR_GOOGLE_AI_STUDIO_API_KEY';
     this.baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
-    this.isEnabled = true; // 実際のAPIキーが設定されているかどうか
+    this.isEnabled = this.apiKey && this.apiKey !== 'YOUR_GOOGLE_AI_STUDIO_API_KEY' && this.apiKey.trim() !== '';
     
     console.log('🚀 AIAPIService initialized with key:', this.apiKey ? 'VALID' : 'MISSING');
     console.log('🔧 API Enabled:', this.isEnabled);

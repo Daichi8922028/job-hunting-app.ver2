@@ -4,6 +4,7 @@ class ChatSystem {
   constructor() {
     this.currentChatType = null;
     this.currentChatId = null;
+    this.userId = null;
     this.chatHistory = {
       self: [],
       company: [],
@@ -11,9 +12,12 @@ class ChatSystem {
     };
     this.isTyping = false;
     this.init();
-  }  init() {
+  }
+
+  async init() {
+    await this.waitForFirebase();
     // チャット履歴をローカルストレージから読み込み
-    this.loadChatHistory();
+    await this.loadChatHistory();
     
     // チャットセッションをローカルストレージから読み込み
     this.loadChatSessions();
@@ -57,6 +61,19 @@ class ChatSystem {
     });
   }
 
+  // Wait until Firebase is ready and obtain the UID
+  async waitForFirebase() {
+    if (!window.firebase) return;
+    await new Promise(resolve => {
+      firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+          this.userId = user.uid;
+          resolve();
+        }
+      });
+    });
+  }
+
   async sendMessage(type) {
     const input = document.getElementById(`chat-input-${type}`);
     const messagesContainer = document.getElementById(`chat-messages-${type}`);
@@ -73,6 +90,10 @@ class ChatSystem {
 
     // ユーザーメッセージを追加
     this.addMessage(type, message, 'user');
+    if (window.sendMessage && firebaseAuth.currentUser) {
+      // Firestoreに保存
+      sendMessage(firebaseAuth.currentUser.uid, message);
+    }
     
     // 入力欄をクリア
     input.value = '';
@@ -90,6 +111,9 @@ class ChatSystem {
       const response = await this.getAIResponse(type, message);
       this.hideTypingIndicator(type);
       this.addMessage(type, response, 'ai');
+      if (window.sendMessage && firebaseAuth.currentUser) {
+        sendMessage(firebaseAuth.currentUser.uid, response);
+      }
       console.log('✅ Chat System: AI response received successfully');
     } catch (error) {
       console.error('❌ Chat System Error:', error);
@@ -122,12 +146,17 @@ class ChatSystem {
     
     // AIの応答の場合はMarkdownをHTMLに変換
     if (sender === 'ai' && typeof marked !== 'undefined') {
-      try {
-        messageBubble.innerHTML = marked.parse(content);
-      } catch (error) {
-        console.warn('Markdown parsing failed, using plain text:', error);
-        messageBubble.textContent = content;
-      }
+        try {
+          const html = marked.parse(content);
+          if (typeof DOMPurify !== 'undefined') {
+            messageBubble.innerHTML = DOMPurify.sanitize(html);
+          } else {
+            messageBubble.innerHTML = html;
+          }
+        } catch (error) {
+          console.warn('Markdown parsing failed, using plain text:', error);
+          messageBubble.textContent = content;
+        }
     } else {
       messageBubble.textContent = content;
     }
@@ -162,8 +191,18 @@ class ChatSystem {
       timestamp: new Date().toISOString(),
       type: type
     };
-    
+
     this.chatHistory[type].push(chatEntry);
+
+    // Save to Firestore if available
+    if (window.db && this.userId) {
+      window.db
+        .collection('chats')
+        .doc(this.userId)
+        .collection('messages')
+        .add(chatEntry)
+        .catch(err => console.error('Firestore save error:', err));
+    }
     
     // チャットセッションのタイトルを更新（最初のユーザーメッセージから）
     if (sender === 'user') {
@@ -389,10 +428,25 @@ class ChatSystem {
       `<button class="prompt-btn" onclick="sendSuggestedPrompt('${prompt}')">${prompt}</button>`
     ).join('');
   }
-  loadChatHistory() {
+  async loadChatHistory() {
     const saved = localStorage.getItem('jobHuntingApp_chatHistory');
     if (saved) {
       this.chatHistory = JSON.parse(saved);
+    }
+
+    // Load from Firestore if available
+    if (window.db && this.userId) {
+      try {
+        const snapshot = await window.db.collection('chats').doc(this.userId).collection('messages').orderBy('timestamp').get();
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          if (this.chatHistory[data.type]) {
+            this.chatHistory[data.type].push(data);
+          }
+        });
+      } catch (e) {
+        console.error('Firestore load error:', e);
+      }
     }
   }
 
@@ -530,13 +584,18 @@ class ChatSystem {
     messageBubble.className = `message-bubble ${sender}`;
     
     // AIの応答の場合はMarkdownをHTMLに変換
-    if (sender === 'ai' && typeof marked !== 'undefined') {
-      try {
-        messageBubble.innerHTML = marked.parse(content);
-      } catch (error) {
-        console.warn('Markdown parsing failed, using plain text:', error);
-        messageBubble.textContent = content;
-      }
+      if (sender === 'ai' && typeof marked !== 'undefined') {
+        try {
+          const html = marked.parse(content);
+          if (typeof DOMPurify !== 'undefined') {
+            messageBubble.innerHTML = DOMPurify.sanitize(html);
+          } else {
+            messageBubble.innerHTML = html;
+          }
+        } catch (error) {
+          console.warn('Markdown parsing failed, using plain text:', error);
+          messageBubble.textContent = content;
+        }
     } else {
       messageBubble.textContent = content;
     }
