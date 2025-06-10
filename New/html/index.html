@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>就活支援アプリ</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Markdown表示用ライブラリ -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <!-- オープン画面 -->
+  <div id="open-screen">
+    <img src="../assets/logo.png" alt="アプリロゴ" class="logo">
+    <h1>ようこそ！</h1>
+    <p>就活支援アプリへ</p>
+  </div>
+
+  <!-- 新規登録画面 -->
+  <div id="register-screen" class="auth-screen" style="display:none;">
+    <div class="auth-container">
+      <div class="auth-header">
+        <img src="../assets/logo.png" alt="アプリロゴ" class="auth-logo">
+        <h2>アカウント作成</h2>
+        <p class="auth-subtitle">就活をサポートするために、まずはアカウントを作成しましょう</p>
+      </div>
+      
+      <form id="register-form" class="auth-form">
+        <div class="form-group">
+          <label for="register-email">メールアドレス</label>
+          <input type="email" id="register-email" name="email" placeholder="example@email.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="register-password">パスワード</label>
+          <input type="password" id="register-password" name="password" placeholder="8文字以上、英数字を含む" required minlength="8">
+          <div class="password-requirements">
+            <ul>
+              <li id="length-check">✗ 8文字以上</li>
+              <li id="letter-check">✗ 英字を含む</li>
+              <li id="number-check">✗ 数字を含む</li>
+            </ul>
+          </div>
+        </div>
+        
+        <button type="submit" class="auth-button primary">アカウントを作成</button>
+      </form>
+      
+      <div id="register-questions" class="questions-section" style="display:none;">
+        <h3>就活状況について教えてください</h3>
+        <div id="questions-area"></div>
+        <button id="questions-submit" class="auth-button primary" style="display:none;">次へ</button>
+      </div>
+      
+      <div class="auth-footer">
+        <p>既にアカウントをお持ちですか？</p>
+        <button type="button" class="auth-button secondary" onclick="showLoginScreen()">ログインはこちら</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ログイン画面 -->
+  <div id="login-screen" class="auth-screen" style="display:none;">
+    <div class="auth-container">
+      <div class="auth-header">
+        <img src="../assets/logo.png" alt="アプリロゴ" class="auth-logo">
+        <h2>おかえりなさい</h2>
+        <p class="auth-subtitle">アカウントにログインして就活を続けましょう</p>
+      </div>
+      
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">メールアドレス</label>
+          <input type="email" id="login-email" name="email" placeholder="example@email.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="login-password">パスワード</label>
+          <input type="password" id="login-password" name="password" placeholder="パスワードを入力" required>
+        </div>
+        
+        <button type="submit" class="auth-button primary">ログイン</button>
+      </form>
+      
+      <div class="auth-footer">
+        <p>まだアカウントをお持ちでないですか？</p>
+        <button type="button" class="auth-button secondary" onclick="showRegisterScreen()">新規登録はこちら</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ホーム画面 -->
+  <div id="home-screen" style="display:none;">
+    <div class="home-header">
+      <h2>ホーム</h2>
+    </div>
+    
+    <div id="jobflow-area">
+      <div id="view-switcher" style="text-align:center; margin-bottom:18px;">
+        <button id="show-timeline" class="active">タイムラインで見る</button>
+        <button id="show-progress">進捗バーで見る</button>
+      </div>
+      <div id="timeline-view"></div>
+      <div id="progress-view" style="display:none;"></div>
+    </div>
+    
+    <div id="navbar">
+      <button onclick="showAnalysisScreen('self')">
+        <i class="fas fa-user"></i>
+        自己分析
+      </button>
+      <button onclick="showAnalysisScreen('company')">
+        <i class="fas fa-building"></i>
+        企業分析
+      </button>
+      <button onclick="showAnalysisScreen('industry')">
+        <i class="fas fa-chart-line"></i>
+        業界分析
+      </button>
+    </div>
+  </div>
+
+  <!-- ChatGPTライクなレイアウト - 自己分析画面 -->
+  <div id="analysis-self-screen" class="chat-layout" style="display:none;">
+    <!-- サイドバー：会話履歴 -->
+    <div class="chat-sidebar">
+      <div class="sidebar-header">
+        <button class="new-chat-btn" onclick="startNewChat('self')">
+          <i class="fas fa-plus"></i>
+          新しいチャット
+        </button>
+      </div>
+      <div class="chat-history">
+        <div class="history-section">
+          <h4>今日</h4>
+          <div class="history-list" id="today-chats-self"></div>
+        </div>
+        <div class="history-section">
+          <h4>過去7日間</h4>
+          <div class="history-list" id="week-chats-self"></div>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <button class="back-to-home-btn" onclick="showHomeScreen()">
+          <i class="fas fa-home"></i>
+          ホームへ戻る
+        </button>
+      </div>
+    </div>
+
+    <!-- メインチャットエリア -->
+    <div class="chat-main">
+      <div class="chat-header">
+        <h2><i class="fas fa-user"></i> 自己分析AI</h2>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      
+      <div class="chat-messages" id="chat-messages-self">
+        <div class="welcome-message">
+          <div class="ai-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="message-content">
+            <h3>自己分析をサポートします</h3>
+            <p>あなたの強み、価値観、キャリア目標について一緒に考えましょう。何でもお気軽にお話しください。</p>
+            <div class="suggested-prompts">
+              <button class="prompt-btn" onclick="sendSuggestedPrompt('私の強みを見つけたいです')">私の強みを見つけたい</button>
+              <button class="prompt-btn" onclick="sendSuggestedPrompt('価値観について考えたいです')">価値観について考えたい</button>
+              <button class="prompt-btn" onclick="sendSuggestedPrompt('将来のキャリア目標を明確にしたいです')">キャリア目標を明確にしたい</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chat-input-container">
+        <div class="chat-input-wrapper">
+          <textarea id="chat-input-self" placeholder="自己分析について質問してください..." rows="1"></textarea>
+          <button id="send-btn-self" class="send-btn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ChatGPTライクなレイアウト - 企業分析画面 -->
+  <div id="analysis-company-screen" class="chat-layout" style="display:none;">
+    <div class="chat-sidebar">
+      <div class="sidebar-header">
+        <button class="new-chat-btn" onclick="startNewChat('company')">
+          <i class="fas fa-plus"></i>
+          新しいチャット
+        </button>
+      </div>
+      <div class="chat-history">
+        <div class="history-section">
+          <h4>今日</h4>
+          <div class="history-list" id="today-chats-company"></div>
+        </div>
+        <div class="history-section">
+          <h4>過去7日間</h4>
+          <div class="history-list" id="week-chats-company"></div>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <button class="back-to-home-btn" onclick="showHomeScreen()">
+          <i class="fas fa-home"></i>
+          ホームへ戻る
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-main">
+      <div class="chat-header">
+        <h2><i class="fas fa-building"></i> 企業分析AI</h2>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      
+      <div class="chat-messages" id="chat-messages-company">
+        <div class="welcome-message">
+          <div class="ai-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="message-content">
+            <h3>企業分析をサポートします</h3>
+            <p>気になる企業の詳細な分析や比較検討をお手伝いします。企業名や業界を教えてください。</p>
+            <div class="suggested-prompts">
+              <button class="prompt-btn" onclick="sendSuggestedPrompt('IT業界の主要企業について教えて')">IT業界の主要企業</button>
+              <button class="prompt-btn" onclick="sendSuggestedPrompt('企業文化の調べ方を教えて')">企業文化の調べ方</button>
+              <button class="prompt-btn" onclick="sendSuggestedPrompt('企業の成長性を分析したい')">企業の成長性分析</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chat-input-container">
+        <div class="chat-input-wrapper">
+          <textarea id="chat-input-company" placeholder="企業について質問してください..." rows="1"></textarea>
+          <button id="send-btn-company" class="send-btn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ChatGPTライクなレイアウト - 業界分析画面 -->
+  <div id="analysis-industry-screen" class="chat-layout" style="display:none;">
+    <div class="chat-sidebar">
+      <div class="sidebar-header">
+        <button class="new-chat-btn" onclick="startNewChat('industry')">
+          <i class="fas fa-plus"></i>
+          新しいチャット
+        </button>
+      </div>
+      <div class="chat-history">
+        <div class="history-section">
+          <h4>今日</h4>
+          <div class="history-list" id="today-chats-industry"></div>
+        </div>
+        <div class="history-section">
+          <h4>過去7日間</h4>
+          <div class="history-list" id="week-chats-industry"></div>
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <button class="back-to-home-btn" onclick="showHomeScreen()">
+          <i class="fas fa-home"></i>
+          ホームへ戻る
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-main">
+      <div class="chat-header">
+        <h2><i class="fas fa-chart-line"></i> 業界分析AI</h2>
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+      
+      <div class="chat-messages" id="chat-messages-industry">
+        <div class="welcome-message">
+          <div class="ai-avatar">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div class="message-content">
+            <h3>業界分析をサポートします</h3>
+            <p>各業界の動向、将来性、必要なスキルなどについて分析をお手伝いします。</p>
+            <div class="suggested-prompts">
+              <button class="prompt-btn" onclick="sendSuggestedPrompt('AI・機械学習業界の動向を教えて')">AI・機械学習業界</button>
+              <button class="prompt-btn" onclick="sendSuggestedPrompt('金融業界のトレンドを知りたい')">金融業界のトレンド</button>
+              <button class="prompt-btn" onclick="sendSuggestedPrompt('成長している業界を教えて')">成長している業界</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="chat-input-container">
+        <div class="chat-input-wrapper">
+          <textarea id="chat-input-industry" placeholder="業界について質問してください..." rows="1"></textarea>
+          <button id="send-btn-industry" class="send-btn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/open.js"></script>
+  <script src="../js/register.js"></script>
+  <script src="../js/login.js"></script>
+  <script src="../js/home.js"></script>
+  <script src="../js/ai_api.js"></script>
+  <script src="../js/analysis_self.js"></script>
+  <script src="../js/analysis_company.js"></script>
+  <script src="../js/analysis_industry.js"></script>
+  <script src="../js/chat_system.js"></script>
+</body>
+</html>

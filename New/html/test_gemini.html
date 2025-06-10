@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini API テスト</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .log {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .success {
+      background: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+    .error {
+      background: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔬 Gemini API 接続テスト</h1>
+    
+    <div class="test-section">
+      <h3>1. APIキー確認</h3>
+      <button onclick="checkApiKey()">APIキーをチェック</button>
+      <div id="apiKeyResult" class="log"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>2. 基本的なAPI接続テスト</h3>
+      <button onclick="testBasicConnection()">接続テストを実行</button>
+      <div id="connectionResult" class="log"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>3. カスタムメッセージテスト</h3>
+      <input type="text" id="testMessage" placeholder="テスト用メッセージを入力" value="こんにちは！今日はいい天気ですね。">
+      <button onclick="testCustomMessage()">カスタムメッセージをテスト</button>
+      <div id="customResult" class="log"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>4. 就活アプリ統合テスト</h3>
+      <button onclick="testJobHuntingIntegration()">就活アプリとの統合をテスト</button>
+      <div id="integrationResult" class="log"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>📊 リアルタイムログ</h3>
+      <button onclick="clearLog()">ログをクリア</button>
+      <div id="realTimeLog" class="log"></div>
+    </div>
+  </div>
+
+  <script src="js/ai_api.js"></script>
+  <script>
+    let originalConsoleLog = console.log;
+    let originalConsoleError = console.error;
+    
+    // コンソールログをページに表示
+    function addToLog(message, type = 'info') {
+      const logDiv = document.getElementById('realTimeLog');
+      const timestamp = new Date().toLocaleTimeString();
+      logDiv.textContent += `[${timestamp}] ${message}\n`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+      
+      if (type === 'error') {
+        logDiv.classList.add('error');
+      }
+    }
+    
+    console.log = function(...args) {
+      originalConsoleLog.apply(console, args);
+      addToLog(args.join(' '), 'info');
+    };
+    
+    console.error = function(...args) {
+      originalConsoleError.apply(console, args);
+      addToLog('ERROR: ' + args.join(' '), 'error');
+    };
+
+    // テスト関数
+    async function checkApiKey() {
+      const resultDiv = document.getElementById('apiKeyResult');
+      resultDiv.textContent = '';
+      
+      try {
+        const apiService = window.aiApiService || new AIAPIService();
+        const hasKey = apiService.apiKey && apiService.apiKey !== 'YOUR_GOOGLE_AI_STUDIO_API_KEY';
+        const isEnabled = apiService.isEnabled;
+        
+        let result = `APIキー: ${hasKey ? '設定済み (' + apiService.apiKey.substring(0, 10) + '...)' : '未設定'}\n`;
+        result += `有効状態: ${isEnabled ? '有効' : '無効'}\n`;
+        result += `ベースURL: ${apiService.baseUrl}\n`;
+        
+        resultDiv.textContent = result;
+        resultDiv.classList.add(hasKey && isEnabled ? 'success' : 'error');
+      } catch (error) {
+        resultDiv.textContent = 'エラー: ' + error.message;
+        resultDiv.classList.add('error');
+      }
+    }
+
+    async function testBasicConnection() {
+      const resultDiv = document.getElementById('connectionResult');
+      resultDiv.textContent = '接続テスト中...\n';
+      resultDiv.classList.remove('success', 'error');
+      
+      try {
+        const apiService = window.aiApiService || new AIAPIService();
+        
+        const testUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
+        const response = await fetch(`${testUrl}?key=${apiService.apiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: "Hello, please respond with 'Hello from Gemini!'"
+              }]
+            }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 100,
+            }
+          })
+        });
+
+        resultDiv.textContent += `レスポンスステータス: ${response.status}\n`;
+        
+        if (response.ok) {
+          const data = await response.json();
+          resultDiv.textContent += `成功！\n`;
+          resultDiv.textContent += `レスポンス: ${JSON.stringify(data, null, 2)}\n`;
+          resultDiv.classList.add('success');
+        } else {
+          const errorText = await response.text();
+          resultDiv.textContent += `エラー: ${errorText}\n`;
+          resultDiv.classList.add('error');
+        }
+      } catch (error) {
+        resultDiv.textContent += `接続エラー: ${error.message}\n`;
+        resultDiv.classList.add('error');
+      }
+    }
+
+    async function testCustomMessage() {
+      const message = document.getElementById('testMessage').value;
+      const resultDiv = document.getElementById('customResult');
+      resultDiv.textContent = 'カスタムメッセージテスト中...\n';
+      resultDiv.classList.remove('success', 'error');
+      
+      try {
+        const apiService = window.aiApiService || new AIAPIService();
+        const response = await apiService.generateResponse('self', message);
+        
+        resultDiv.textContent += `入力: ${message}\n`;
+        resultDiv.textContent += `AI応答: ${response}\n`;
+        resultDiv.classList.add('success');
+      } catch (error) {
+        resultDiv.textContent += `エラー: ${error.message}\n`;
+        resultDiv.classList.add('error');
+      }
+    }
+
+    async function testJobHuntingIntegration() {
+      const resultDiv = document.getElementById('integrationResult');
+      resultDiv.textContent = '就活アプリ統合テスト中...\n';
+      resultDiv.classList.remove('success', 'error');
+      
+      try {
+        const apiService = window.aiApiService || new AIAPIService();
+        
+        // 自己分析テスト
+        const selfResponse = await apiService.generateResponse('self', '私の強みを見つけたいです');
+        resultDiv.textContent += `自己分析応答: ${selfResponse.substring(0, 100)}...\n\n`;
+        
+        // 企業分析テスト
+        const companyResponse = await apiService.generateResponse('company', 'Google社について教えてください');
+        resultDiv.textContent += `企業分析応答: ${companyResponse.substring(0, 100)}...\n\n`;
+        
+        // 業界分析テスト
+        const industryResponse = await apiService.generateResponse('industry', 'IT業界の動向を知りたいです');
+        resultDiv.textContent += `業界分析応答: ${industryResponse.substring(0, 100)}...\n`;
+        
+        resultDiv.classList.add('success');
+      } catch (error) {
+        resultDiv.textContent += `統合テストエラー: ${error.message}\n`;
+        resultDiv.classList.add('error');
+      }
+    }
+
+    function clearLog() {
+      document.getElementById('realTimeLog').textContent = '';
+    }
+
+    // ページ読み込み時に自動でAPIキーチェック
+    window.addEventListener('load', () => {
+      setTimeout(checkApiKey, 1000);
+    });
+  </script>
+</body>
+</html>
