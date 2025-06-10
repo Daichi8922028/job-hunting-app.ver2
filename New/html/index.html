@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Markdown表示用ライブラリ -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- HTML Sanitization -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.4/purify.min.js"></script>
 </head>
 <body>
   <!-- オープン画面 -->
@@ -314,14 +316,18 @@
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="../js/firebase_init.js"></script>
+
   <script src="../js/config.js"></script>
+  <script type="module" src="../js/firebase_init.js"></script>
   <script src="../js/open.js"></script>
   <script src="../js/register.js"></script>
   <script src="../js/login.js"></script>
   <script src="../js/home.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase_init.js"></script>
   <script src="../js/ai_api.js"></script>
   <script src="../js/analysis_self.js"></script>
   <script src="../js/analysis_company.js"></script>

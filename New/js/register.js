@@ -22,31 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('パスワードが要件を満たしていません。8文字以上で英字と数字を含む必要があります。');
         return;
       }
-
-      try {
-        const userCred = await firebaseAuth.createUserWithEmailAndPassword(email, password);
-        localStorage.setItem('firebaseUid', userCred.user.uid);
-        // 登録フォーム非表示、ヒアリング質問表示
-        regForm.style.display = 'none';
-        showDropdownQuestions();
-      } catch (err) {
-        alert(err.message);
-      }
-    });
-  }
-
-  // Google登録ボタン
-  const googleBtn = document.getElementById('google-register');
-  if (googleBtn) {
-    googleBtn.addEventListener('click', async () => {
-      try {
-        const result = await firebaseAuth.signInWithPopup(googleProvider);
-        localStorage.setItem('firebaseUid', result.user.uid);
-        regForm.style.display = 'none';
-        showDropdownQuestions();
-      } catch (err) {
-        alert(err.message);
-      }
     });
   }
 
