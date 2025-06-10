@@ -1,9 +1,30 @@
 // ai_api.js: Google AI Studio API連携
 
+function getInitialApiKey() {
+  if (typeof window !== 'undefined') {
+    if (window.GEMINI_API_KEY) {
+      return window.GEMINI_API_KEY;
+    }
+    const meta = document.querySelector('meta[name="gemini-api-key"]');
+    if (meta && meta.content) {
+      return meta.content;
+    }
+    try {
+      const stored = localStorage.getItem('jobHuntingApp_apiKey');
+      if (stored) {
+        return stored;
+      }
+    } catch (e) {
+      // ignore access issues
+    }
+  }
+  return 'YOUR_GOOGLE_AI_STUDIO_API_KEY';
+}
+
 class AIAPIService {
   constructor() {
-    // 環境変数からAPIキーを取得
-    this.apiKey = process.env.GEMINI_API_KEY || 'YOUR_GOOGLE_AI_STUDIO_API_KEY';
+    // 安全なソースからAPIキーを取得
+    this.apiKey = getInitialApiKey();
     this.baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent';
     this.isEnabled = this.apiKey && this.apiKey !== 'YOUR_GOOGLE_AI_STUDIO_API_KEY' && this.apiKey.trim() !== '';
     

@@ -1,11 +1,32 @@
 // config.js: アプリケーション設定
 
+function getInitialApiKey() {
+  if (typeof window !== 'undefined') {
+    if (window.GEMINI_API_KEY) {
+      return window.GEMINI_API_KEY;
+    }
+    const meta = document.querySelector('meta[name="gemini-api-key"]');
+    if (meta && meta.content) {
+      return meta.content;
+    }
+    try {
+      const stored = localStorage.getItem('jobHuntingApp_apiKey');
+      if (stored) {
+        return stored;
+      }
+    } catch (e) {
+      // ignore access issues
+    }
+  }
+  return 'YOUR_GOOGLE_AI_STUDIO_API_KEY';
+}
+
 const AppConfig = {
   // Google AI Studio API設定
   ai: {
     // Google AI Studio APIキー
-    // 環境変数 GEMINI_API_KEY を参照し、未設定の場合はプレースホルダーを使用
-    apiKey: process.env.GEMINI_API_KEY || 'YOUR_GOOGLE_AI_STUDIO_API_KEY',
+    // window 変数、meta タグ、localStorage の順に取得
+    apiKey: getInitialApiKey(),
     
     // APIが無効の場合はフォールバック応答を使用
     enableFallback: true,
