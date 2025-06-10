@@ -6,18 +6,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (homeScreen) {
     // ナビバーのボタンにイベント付与
     document
-      .querySelector("#navbar button[onclick*='self']")
-      ?.addEventListener("click", () => showAnalysisScreen('self'));
+      .querySelector('#navbar button[onclick*=\'self\']')
+      ?.addEventListener('click', () => showAnalysisScreen('self'));
     document
-      .querySelector("#navbar button[onclick*='company']")
-      ?.addEventListener("click", () => showAnalysisScreen('company'));
+      .querySelector('#navbar button[onclick*=\'company\']')
+      ?.addEventListener('click', () => showAnalysisScreen('company'));
     document
-      .querySelector("#navbar button[onclick*='industry']")
-      ?.addEventListener("click", () => showAnalysisScreen('industry'));
+      .querySelector('#navbar button[onclick*=\'industry\']')
+      ?.addEventListener('click', () => showAnalysisScreen('industry'));
 
     // ホーム画面が表示されたら進捗描画
     const observer = new MutationObserver(() => {
-      if (homeScreen.style.display !== "none") {
+      if (homeScreen.style.display !== 'none') {
         initializeFlowVisualization();
       }
     });
@@ -49,10 +49,10 @@ function initializeFlowVisualization() {
 // 質問回答で学年・業界情報を取得
 function getUserInfo() {
   const uid = localStorage.getItem('firebaseUid') || '';
-  const answers = JSON.parse(localStorage.getItem(`personalizedAnswers_${uid}`) || "{}");
+  const answers = JSON.parse(localStorage.getItem(`personalizedAnswers_${uid}`) || '{}');
   return {
-    grade: answers.grade || "3年",
-    industry: answers.industry || "未定"
+    grade: answers.grade || '3年',
+    industry: answers.industry || '未定'
   };
 }
 
@@ -75,12 +75,12 @@ function getPersonalizedTimeline() {
   ];
 
   // 業界によって時期をずらす
-  if (userInfo.industry === "コンサル" || userInfo.industry === "IT") {
+  if (userInfo.industry === 'コンサル' || userInfo.industry === 'IT') {
     actionSteps = actionSteps.map(step => {
-      if (step.id === "es" || step.id === "test") {
+      if (step.id === 'es' || step.id === 'test') {
         return { ...step, month: '3年秋' };
       }
-      if (step.id === "interview") {
+      if (step.id === 'interview') {
         return { ...step, month: '3年冬' };
       }
       return step;
@@ -88,7 +88,7 @@ function getPersonalizedTimeline() {
   }
 
   // 学年による調整
-  if (userInfo.grade === "4年" || userInfo.grade === "院2年") {
+  if (userInfo.grade === '4年' || userInfo.grade === '院2年') {
     const adjustMonth = (month) => month.replace('3年', '今年').replace('4年', '今年');
     analysisSteps.forEach(step => step.month = adjustMonth(step.month));
     actionSteps.forEach(step => step.month = adjustMonth(step.month));
@@ -100,7 +100,7 @@ function getPersonalizedTimeline() {
 // 進捗状況の計算（AIとの壁打ち回数やチャット履歴から）
 function getStepProgress(id) {
   // チャット履歴から進捗を計算
-  const chatHistory = JSON.parse(localStorage.getItem(`chat_${id}`) || "[]");
+  const chatHistory = JSON.parse(localStorage.getItem(`chat_${id}`) || '[]');
   const interactionCount = chatHistory.length;
   
   // 5回以上やり取りしていれば完了とみなす
@@ -166,9 +166,9 @@ function showAnalysisScreen(type) {
   console.log('🔄 Switching to analysis screen:', type);
   
   // 画面を切り替え
-  if (type === "self") showScreen('analysis-self-screen');
-  if (type === "company") showScreen('analysis-company-screen');
-  if (type === "industry") showScreen('analysis-industry-screen');
+  if (type === 'self') showScreen('analysis-self-screen');
+  if (type === 'company') showScreen('analysis-company-screen');
+  if (type === 'industry') showScreen('analysis-industry-screen');
   
   // チャットシステムが初期化されているかチェック
   if (window.chatSystem) {
@@ -196,7 +196,7 @@ function showHomeScreen() {
 
 // 分析画面でのチャット履歴を保存する関数（進捗計算用）
 function saveAnalysisProgress(type, message) {
-  const chatHistory = JSON.parse(localStorage.getItem(`chat_${type}`) || "[]");
+  const chatHistory = JSON.parse(localStorage.getItem(`chat_${type}`) || '[]');
   chatHistory.push({
     timestamp: Date.now(),
     message: message
