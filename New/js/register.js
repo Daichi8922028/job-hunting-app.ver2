@@ -10,29 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // 新規登録フォームの送信イベント
   const regForm = document.getElementById('register-form');
   if (regForm) {
-    regForm.addEventListener('submit', function(e) {
+    regForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      
+
       // 入力値取得
       const email = regForm.elements['email'].value;
       const password = regForm.elements['password'].value;
-      
+
       // パスワードバリデーション
       if (!isValidPassword(password)) {
         alert('パスワードが要件を満たしていません。8文字以上で英字と数字を含む必要があります。');
         return;
       }
-      
-      // Firebaseでユーザー登録
-      signUp(email, password)
-        .then(() => {
-          // 登録フォーム非表示、ヒアリング質問表示
-          regForm.style.display = 'none';
-          showDropdownQuestions();
-        })
-        .catch(() => {
-          // エラー処理はsignUp内でアラート表示
-        });
     });
   }
 
@@ -48,8 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      const uid = localStorage.getItem('firebaseUid') || '';
       const answers = { grade, industry };
-      localStorage.setItem('personalizedAnswers', JSON.stringify(answers));
+      localStorage.setItem(`personalizedAnswers_${uid}`, JSON.stringify(answers));
       showScreen('home-screen');
     });
   }

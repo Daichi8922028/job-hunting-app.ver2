@@ -48,7 +48,8 @@ function initializeFlowVisualization() {
 
 // 質問回答で学年・業界情報を取得
 function getUserInfo() {
-  const answers = JSON.parse(localStorage.getItem('personalizedAnswers') || "{}");
+  const uid = localStorage.getItem('firebaseUid') || '';
+  const answers = JSON.parse(localStorage.getItem(`personalizedAnswers_${uid}`) || "{}");
   return {
     grade: answers.grade || "3年",
     industry: answers.industry || "未定"

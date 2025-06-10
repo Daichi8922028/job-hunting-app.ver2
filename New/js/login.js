@@ -3,18 +3,12 @@
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', async function(e) {
       e.preventDefault();
 
       const email = loginForm.elements['email'].value;
       const password = loginForm.elements['password'].value;
-      login(email, password)
-        .then(() => {
-          showScreen('home-screen');
-        })
-        .catch(() => {
-          // エラー処理はlogin内でアラート表示
-        });
+
     });
   }
 });
