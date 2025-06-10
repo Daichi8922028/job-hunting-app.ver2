@@ -862,7 +862,8 @@ button.success:hover, .button.success:hover {
   border-color: var(--primary-color);
 }
 
-.timeline-step.done {
+.timeline-step.done,
+.flow-step.done {
   background: var(--primary-color);
   color: var(--light-text);
   border-color: var(--primary-color);
@@ -948,10 +949,7 @@ button.success:hover, .button.success:hover {
 }
 
 .flow-step.done {
-  background: var(--primary-color);
-  color: var(--light-text);
   opacity: 1;
-  border-color: var(--primary-color);
 }
 
 /* 進捗パーセンテージバー */
