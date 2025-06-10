@@ -3,26 +3,32 @@
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      // ------ テスト用：何を入力してもホーム画面へ進む ------
-      showScreen('home-screen');
-
-      /* ------ 本来の認証処理（DB連携/LocalStorage用） ------
       const email = loginForm.elements['email'].value;
       const password = loginForm.elements['password'].value;
-      // 例：localStorageから値を取得して認証
-      if (
-        email === localStorage.getItem('userEmail') &&
-        password === localStorage.getItem('userPassword')
-      ) {
+
+      try {
+        const userCred = await firebaseAuth.signInWithEmailAndPassword(email, password);
+        localStorage.setItem('firebaseUid', userCred.user.uid);
         showScreen('home-screen');
-      } else {
+      } catch (err) {
         alert('メールアドレスまたはパスワードが違います');
       }
-      // ------ 本来の認証ここまで ------
-      */
+    });
+  }
+
+  const googleBtn = document.getElementById('google-login');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', async () => {
+      try {
+        const result = await firebaseAuth.signInWithPopup(googleProvider);
+        localStorage.setItem('firebaseUid', result.user.uid);
+        showScreen('home-screen');
+      } catch (err) {
+        alert(err.message);
+      }
     });
   }
 });

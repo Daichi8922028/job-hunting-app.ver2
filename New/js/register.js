@@ -10,25 +10,43 @@ document.addEventListener('DOMContentLoaded', () => {
   // 新規登録フォームの送信イベント
   const regForm = document.getElementById('register-form');
   if (regForm) {
-    regForm.addEventListener('submit', function(e) {
+    regForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      
+
       // 入力値取得
       const email = regForm.elements['email'].value;
       const password = regForm.elements['password'].value;
-      
+
       // パスワードバリデーション
       if (!isValidPassword(password)) {
         alert('パスワードが要件を満たしていません。8文字以上で英字と数字を含む必要があります。');
         return;
       }
-      
-      // 仮でlocalStorage保存
-      localStorage.setItem('userEmail', email);
-      localStorage.setItem('userPassword', password);
-      // 登録フォーム非表示、ヒアリング質問表示
-      regForm.style.display = 'none';
-      showDropdownQuestions();
+
+      try {
+        const userCred = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+        localStorage.setItem('firebaseUid', userCred.user.uid);
+        // 登録フォーム非表示、ヒアリング質問表示
+        regForm.style.display = 'none';
+        showDropdownQuestions();
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+  }
+
+  // Google登録ボタン
+  const googleBtn = document.getElementById('google-register');
+  if (googleBtn) {
+    googleBtn.addEventListener('click', async () => {
+      try {
+        const result = await firebaseAuth.signInWithPopup(googleProvider);
+        localStorage.setItem('firebaseUid', result.user.uid);
+        regForm.style.display = 'none';
+        showDropdownQuestions();
+      } catch (err) {
+        alert(err.message);
+      }
     });
   }
 
@@ -44,8 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      const uid = localStorage.getItem('firebaseUid') || '';
       const answers = { grade, industry };
-      localStorage.setItem('personalizedAnswers', JSON.stringify(answers));
+      localStorage.setItem(`personalizedAnswers_${uid}`, JSON.stringify(answers));
       showScreen('home-screen');
     });
   }
