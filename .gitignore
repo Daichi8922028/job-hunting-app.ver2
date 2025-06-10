@@ -3,6 +3,7 @@ node_modules/
 # Environment files
 .env
 .env.*
+load_env.js
 
 
 # Local environment loader
