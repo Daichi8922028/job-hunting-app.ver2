@@ -2,7 +2,7 @@
 
 function getInitialApiKey() {
   // 環境変数からAPIキーを読み込む
-  return window.env.GEMINI_API_KEY || 'YOUR_GOOGLE_AI_STUDIO_API_KEY'; // 修正
+  return process.env.GEMINI_API_KEY || 'YOUR_GOOGLE_AI_STUDIO_API_KEY';
 }
 
 class AIAPIService {

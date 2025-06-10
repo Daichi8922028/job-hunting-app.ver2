@@ -38,11 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-// ログイン画面への切り替えボタンにイベントリスナーを設定
-  const showLoginButton = document.getElementById('show-login-button');
-  if (showLoginButton) {
-    showLoginButton.addEventListener('click', showLoginScreen);
-  }
 
   // ヒアリング送信ボタン
   const qSubmit = document.getElementById('questions-submit');
@@ -84,29 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
           showDropdownQuestions();
         } catch (error) {
           console.error('Error during Google sign in popup:', error); // 追加
-          let errorMessage = 'Google新規登録に失敗しました。';
-          switch (error.code) {
-            case 'auth/popup-closed-by-user':
-              errorMessage += 'Google認証のポップアップが閉じられました。再度お試しください。';
-              break;
-            case 'auth/cancelled-popup-request':
-              errorMessage += '既にGoogle認証のポップアップが開かれています。開いているウィンドウをご確認ください。';
-              break;
-            case 'auth/operation-not-supported-in-this-environment':
-              errorMessage += 'この環境ではGoogle認証がサポートされていません。ブラウザを変更するか、HTTPS接続を確認してください。';
-              break;
-            case 'auth/auth-domain-config-required':
-              errorMessage += '認証ドメインの設定に問題があります。Firebaseコンソールをご確認ください。';
-              break;
-            case 'auth/credential-already-in-use':
-              errorMessage += 'このGoogleアカウントは既に別のアカウントで使用されています。ログイン画面からお試しください。';
-              break;
-            default:
-              // その他のエラーは汎用メッセージを使用
-              errorMessage += getFirebaseErrorMessage(error);
-              break;
-          }
-          alert(errorMessage);
+          alert('Google新規登録に失敗しました: ' + getFirebaseErrorMessage(error));
           console.error('Google新規登録エラー:', error);
         }
       });

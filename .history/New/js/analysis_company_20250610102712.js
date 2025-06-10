@@ -4,12 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const screen = document.getElementById('analysis-company-screen');
   if (!screen) return;
 
-  const chatArea = screen.querySelector('#chat-messages-company'); // 修正
-  if (!chatArea) { // chatAreaが見つからなかった場合のエラーハンドリングを追加
-    console.error('Error: Chat area element not found in analysis_company-screen');
-    return;
-  }
-
+  const chatArea = screen.querySelector('.chat-area');
   const input = document.createElement('input');
   input.type = 'text';
   input.placeholder = '企業名や気になる業界の特徴を入力...';

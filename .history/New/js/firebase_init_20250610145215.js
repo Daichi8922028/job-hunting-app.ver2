@@ -20,11 +20,6 @@ firebase.auth().onAuthStateChanged(function(user) {
   // initializeRegister(); // register.js の初期化関数
   // initializeLogin(); // login.js の初期化関数
   // chatSystem.init(); // chat_system.js の初期化関数
-
-  // ChatSystemの初期化をFirebase初期化後に実行
-  const chatSystem = new ChatSystem();
-  window.chatSystem = chatSystem;
-  console.log('✅ Chat system initialized and attached to window');
 });
 
 export const firebaseAuth = firebase.auth();

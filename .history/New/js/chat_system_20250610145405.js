@@ -718,4 +718,3 @@ function deleteChat(event, chatId, type) {
 let chatSystem;
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Initializing chat system...');
-});

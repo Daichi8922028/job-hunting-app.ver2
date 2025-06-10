@@ -1,5 +1,5 @@
 // register.js: 新規登録処理＋学年・志望業界のドロップダウンを動的に生成
-import { signUp, getFirebaseErrorMessage } from './auth.js';
+import { signUp } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('DOMContentLoaded fired in register.js'); // 追加
@@ -34,14 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('firebaseUid', cred.user.uid);
         showDropdownQuestions();
       } catch (err) {
-        alert('登録に失敗しました: ' + getFirebaseErrorMessage(err));
+        alert('登録に失敗しました: ' + err.message);
       }
     });
-  }
-// ログイン画面への切り替えボタンにイベントリスナーを設定
-  const showLoginButton = document.getElementById('show-login-button');
-  if (showLoginButton) {
-    showLoginButton.addEventListener('click', showLoginScreen);
   }
 
   // ヒアリング送信ボタン
@@ -71,42 +66,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const googleRegisterButton = document.getElementById('google-register');
     if (googleRegisterButton) {
       googleRegisterButton.addEventListener('click', async function() {
-        console.log('Google register button clicked.'); // 追加
-  
+        // ここに既存のGoogle新規登録処理を移動
+        // window.firebaseAuth の確認は不要になるため削除
         try {
-          console.log('Attempting Google sign in popup.'); // 追加
           const provider = new firebase.auth.GoogleAuthProvider();
-          const result = await firebase.auth().signInWithPopup(provider);
-          console.log('Google sign in popup successful.', result); // 追加
-          const user = result.user;
-          console.log('Google新規登録成功！User:', user);
+          const result = await firebase.auth().signInWithPopup(provider); // firebase.auth() を直接使用
+          const user = result.user; // 追加：ユーザー情報を取得
+          console.log('Google新規登録成功！User:', user); // 修正：ログ出力にユーザー情報を含める
           alert('Google新規登録成功！');
           showDropdownQuestions();
         } catch (error) {
-          console.error('Error during Google sign in popup:', error); // 追加
-          let errorMessage = 'Google新規登録に失敗しました。';
-          switch (error.code) {
-            case 'auth/popup-closed-by-user':
-              errorMessage += 'Google認証のポップアップが閉じられました。再度お試しください。';
-              break;
-            case 'auth/cancelled-popup-request':
-              errorMessage += '既にGoogle認証のポップアップが開かれています。開いているウィンドウをご確認ください。';
-              break;
-            case 'auth/operation-not-supported-in-this-environment':
-              errorMessage += 'この環境ではGoogle認証がサポートされていません。ブラウザを変更するか、HTTPS接続を確認してください。';
-              break;
-            case 'auth/auth-domain-config-required':
-              errorMessage += '認証ドメインの設定に問題があります。Firebaseコンソールをご確認ください。';
-              break;
-            case 'auth/credential-already-in-use':
-              errorMessage += 'このGoogleアカウントは既に別のアカウントで使用されています。ログイン画面からお試しください。';
-              break;
-            default:
-              // その他のエラーは汎用メッセージを使用
-              errorMessage += getFirebaseErrorMessage(error);
-              break;
-          }
-          alert(errorMessage);
+          alert('Google新規登録に失敗しました: ' + error.message);
           console.error('Google新規登録エラー:', error);
         }
       });

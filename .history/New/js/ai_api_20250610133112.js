@@ -1,8 +1,24 @@
 // ai_api.js: Google AI Studio API連携
 
 function getInitialApiKey() {
-  // 環境変数からAPIキーを読み込む
-  return window.env.GEMINI_API_KEY || 'YOUR_GOOGLE_AI_STUDIO_API_KEY'; // 修正
+  if (typeof window !== 'undefined') {
+    if (window.GEMINI_API_KEY) {
+      return window.GEMINI_API_KEY;
+    }
+    const meta = document.querySelector('meta[name="gemini-api-key"]');
+    if (meta && meta.content) {
+      return meta.content;
+    }
+    try {
+      const stored = localStorage.getItem('jobHuntingApp_apiKey');
+      if (stored) {
+        return stored;
+      }
+    } catch (e) {
+      // ignore access issues
+    }
+  }
+  return 'YOUR_GOOGLE_AI_STUDIO_API_KEY';
 }
 
 class AIAPIService {

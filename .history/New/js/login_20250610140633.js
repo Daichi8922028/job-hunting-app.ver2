@@ -1,5 +1,5 @@
 // login.js: テスト開発用（認証スキップ）＋本来の認証コードをコメントで併記
-import { login, getFirebaseErrorMessage } from './auth.js';
+import { login } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('firebaseUid', cred.user.uid);
         showScreen('home-screen');
       } catch (err) {
-        alert('ログインに失敗しました: ' + getFirebaseErrorMessage(err));
+        alert('ログインに失敗しました: ' + err.message);
       }
     });
   }
@@ -31,7 +31,7 @@ if (googleLoginButton) {
       // ログイン成功後の画面遷移など
       showScreen('home-screen'); // 例: ホーム画面へ遷移
     } catch (error) {
-      alert('Googleログインに失敗しました: ' + getFirebaseErrorMessage(error));
+      alert('Googleログインに失敗しました: ' + error.message);
       console.error('Googleログインエラー:', error);
     }
   });

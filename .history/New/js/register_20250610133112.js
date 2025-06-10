@@ -1,16 +1,11 @@
 // register.js: 新規登録処理＋学年・志望業界のドロップダウンを動的に生成
-import { signUp, getFirebaseErrorMessage } from './auth.js';
+import { signUp } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOMContentLoaded fired in register.js'); // 追加
-
   // パスワード入力時のリアルタイムバリデーション
   const passwordInput = document.getElementById('register-password');
-  console.log('passwordInput element:', passwordInput); // 追加
-
   if (passwordInput) {
     passwordInput.addEventListener('input', validatePassword);
-    console.log('input event listener added to passwordInput'); // 追加
   }
 
   // 新規登録フォームの送信イベント
@@ -34,14 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('firebaseUid', cred.user.uid);
         showDropdownQuestions();
       } catch (err) {
-        alert('登録に失敗しました: ' + getFirebaseErrorMessage(err));
+        alert('登録に失敗しました: ' + err.message);
       }
     });
-  }
-// ログイン画面への切り替えボタンにイベントリスナーを設定
-  const showLoginButton = document.getElementById('show-login-button');
-  if (showLoginButton) {
-    showLoginButton.addEventListener('click', showLoginScreen);
   }
 
   // ヒアリング送信ボタン
@@ -62,56 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showScreen('home-screen');
     });
   }
-
-  // Google新規登録ボタンのイベントリスナー
-  // Firebase Authが利用可能になったらイベントリスナーを設定
-  firebase.auth().onAuthStateChanged(function(user) { // 追加
-    console.log('Firebase Auth state changed. Auth service ready.'); // 追加
-
-    const googleRegisterButton = document.getElementById('google-register');
-    if (googleRegisterButton) {
-      googleRegisterButton.addEventListener('click', async function() {
-        console.log('Google register button clicked.'); // 追加
-  
-        try {
-          console.log('Attempting Google sign in popup.'); // 追加
-          const provider = new firebase.auth.GoogleAuthProvider();
-          const result = await firebase.auth().signInWithPopup(provider);
-          console.log('Google sign in popup successful.', result); // 追加
-          const user = result.user;
-          console.log('Google新規登録成功！User:', user);
-          alert('Google新規登録成功！');
-          showDropdownQuestions();
-        } catch (error) {
-          console.error('Error during Google sign in popup:', error); // 追加
-          let errorMessage = 'Google新規登録に失敗しました。';
-          switch (error.code) {
-            case 'auth/popup-closed-by-user':
-              errorMessage += 'Google認証のポップアップが閉じられました。再度お試しください。';
-              break;
-            case 'auth/cancelled-popup-request':
-              errorMessage += '既にGoogle認証のポップアップが開かれています。開いているウィンドウをご確認ください。';
-              break;
-            case 'auth/operation-not-supported-in-this-environment':
-              errorMessage += 'この環境ではGoogle認証がサポートされていません。ブラウザを変更するか、HTTPS接続を確認してください。';
-              break;
-            case 'auth/auth-domain-config-required':
-              errorMessage += '認証ドメインの設定に問題があります。Firebaseコンソールをご確認ください。';
-              break;
-            case 'auth/credential-already-in-use':
-              errorMessage += 'このGoogleアカウントは既に別のアカウントで使用されています。ログイン画面からお試しください。';
-              break;
-            default:
-              // その他のエラーは汎用メッセージを使用
-              errorMessage += getFirebaseErrorMessage(error);
-              break;
-          }
-          alert(errorMessage);
-          console.error('Google新規登録エラー:', error);
-        }
-      });
-    }
-  }); // 追加の閉じカッコ
 });
 
 // 学年・志望業界のドロップダウンを動的生成
@@ -130,7 +70,7 @@ function showDropdownQuestions() {
         <option value="その他">その他</option>
       </select>
     </div>
-
+    
     <div class="form-group">
       <label for="q-industry">志望業界</label>
       <select id="q-industry" class="form-select" required>
@@ -154,7 +94,7 @@ function isValidPassword(password) {
   const minLength = password.length >= 8;
   const hasLetter = /[a-zA-Z]/.test(password);
   const hasNumber = /\d/.test(password);
-
+  
   return minLength && hasLetter && hasNumber;
 }
 
@@ -164,7 +104,7 @@ function validatePassword() {
   const lengthCheck = document.getElementById('length-check');
   const letterCheck = document.getElementById('letter-check');
   const numberCheck = document.getElementById('number-check');
-
+  
   // 文字数チェック
   if (password.length >= 8) {
     lengthCheck.textContent = '✓ 8文字以上';
@@ -173,7 +113,7 @@ function validatePassword() {
     lengthCheck.textContent = '✗ 8文字以上';
     lengthCheck.classList.remove('valid');
   }
-
+  
   // 英字チェック
   if (/[a-zA-Z]/.test(password)) {
     letterCheck.textContent = '✓ 英字を含む';
@@ -182,7 +122,7 @@ function validatePassword() {
     letterCheck.textContent = '✗ 英字を含む';
     letterCheck.classList.remove('valid');
   }
-
+  
   // 数字チェック
   if (/\d/.test(password)) {
     numberCheck.textContent = '✓ 数字を含む';
@@ -197,6 +137,3 @@ function validatePassword() {
 function showLoginScreen() {
   showScreen('login-screen');
 }
-
-// グローバルスコープに公開
-window.showLoginScreen = showLoginScreen;

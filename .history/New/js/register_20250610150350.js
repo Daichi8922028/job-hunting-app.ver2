@@ -38,11 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-// ログイン画面への切り替えボタンにイベントリスナーを設定
-  const showLoginButton = document.getElementById('show-login-button');
-  if (showLoginButton) {
-    showLoginButton.addEventListener('click', showLoginScreen);
-  }
 
   // ヒアリング送信ボタン
   const qSubmit = document.getElementById('questions-submit');

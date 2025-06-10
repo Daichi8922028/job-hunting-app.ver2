@@ -1,6 +1,5 @@
 // auth.js: Firebase Authentication helper functions
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { firebaseAuth } from './firebase_init.js';
 
 export async function signUp(email, password) {
   try {
