@@ -1,4 +1,5 @@
 // register.js: 新規登録処理＋学年・志望業界のドロップダウンを動的に生成
+import { signUp } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // パスワード入力時のリアルタイムバリデーション
@@ -21,6 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!isValidPassword(password)) {
         alert('パスワードが要件を満たしていません。8文字以上で英字と数字を含む必要があります。');
         return;
+      }
+
+      try {
+        const cred = await signUp(email, password);
+        localStorage.setItem('firebaseUid', cred.user.uid);
+        showDropdownQuestions();
+      } catch (err) {
+        alert('登録に失敗しました: ' + err.message);
       }
     });
   }

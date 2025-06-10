@@ -1,4 +1,5 @@
 // login.js: テスト開発用（認証スキップ）＋本来の認証コードをコメントで併記
+import { login } from './auth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('login-form');
@@ -8,7 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const email = loginForm.elements['email'].value;
       const password = loginForm.elements['password'].value;
-
+      try {
+        const cred = await login(email, password);
+        localStorage.setItem('firebaseUid', cred.user.uid);
+        showScreen('home-screen');
+      } catch (err) {
+        alert('ログインに失敗しました: ' + err.message);
+      }
     });
   }
 });
