@@ -19,15 +19,23 @@ This application is a simple front-end project that uses Firebase for authentica
 3. Replace the placeholder values in the following files with your actual Firebase config:
    - `New/js/firebase.js`
    - `New/js/firebase_init.js`
+4. Copy the same values into `.env` if you plan to load them via `load_env.js`.
 
 ### Google AI (Gemini)
 
-1. Copy `.env.example` to `.env` and set your API key:
+1. Create a `.env` file from the example template:
    ```bash
    cp .env.example .env
+   ```
+2. Obtain a Gemini API key from [Google&nbsp;AI Studio](https://aistudio.google.com/app/apikey) or the Google Cloud console and add it to the `.env` file:
+   ```bash
    echo "GEMINI_API_KEY=<your_key>" >> .env
    ```
-2. The key is used by `New/js/ai_api.js` and `New/js/config.js` for connecting to the Gemini API.
+3. The key is used by `New/js/ai_api.js` and `New/js/config.js` to connect to the Gemini API.
+
+### Environment Loader
+
+`load_env.js` reads the values from `.env` and exposes them as `window.env` for the client code. This file is listed in `.gitignore` and should not be committed.
 
 ## Running the Application
 
