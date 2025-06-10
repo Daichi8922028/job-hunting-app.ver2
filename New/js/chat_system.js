@@ -73,6 +73,10 @@ class ChatSystem {
 
     // ユーザーメッセージを追加
     this.addMessage(type, message, 'user');
+    if (window.sendMessage && firebaseAuth.currentUser) {
+      // Firestoreに保存
+      sendMessage(firebaseAuth.currentUser.uid, message);
+    }
     
     // 入力欄をクリア
     input.value = '';
@@ -90,6 +94,9 @@ class ChatSystem {
       const response = await this.getAIResponse(type, message);
       this.hideTypingIndicator(type);
       this.addMessage(type, response, 'ai');
+      if (window.sendMessage && firebaseAuth.currentUser) {
+        sendMessage(firebaseAuth.currentUser.uid, response);
+      }
       console.log('✅ Chat System: AI response received successfully');
     } catch (error) {
       console.error('❌ Chat System Error:', error);

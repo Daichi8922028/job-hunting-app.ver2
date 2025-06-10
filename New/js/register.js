@@ -23,12 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
-      // 仮でlocalStorage保存
-      localStorage.setItem('userEmail', email);
-      localStorage.setItem('userPassword', password);
-      // 登録フォーム非表示、ヒアリング質問表示
-      regForm.style.display = 'none';
-      showDropdownQuestions();
+      // Firebaseでユーザー登録
+      signUp(email, password)
+        .then(() => {
+          // 登録フォーム非表示、ヒアリング質問表示
+          regForm.style.display = 'none';
+          showDropdownQuestions();
+        })
+        .catch(() => {
+          // エラー処理はsignUp内でアラート表示
+        });
     });
   }
 
